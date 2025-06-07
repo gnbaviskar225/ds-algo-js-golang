@@ -1,19 +1,19 @@
 class Coockie {
     constructor(color) {
-        this.color = color
+        this.color = color;
     }
     getColor() {
-        return this.color
+        return this.color;
     }
     setColor(color) {
-        this.color = color
+        this.color = color;
     }
 
 }
 
-let coockieOne = new Coockie("green")
-console.log(coockieOne.color) // green
+let coockieOne = new Coockie("green");
+console.log(coockieOne.color); // green
 
-coockieOne.setColor("yellow")
-console.log(coockieOne.getColor()) // yellow
+coockieOne.setColor("yellow");
+console.log(coockieOne.getColor()); // yellow
 

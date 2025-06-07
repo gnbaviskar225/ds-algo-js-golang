@@ -259,3 +259,63 @@ func (ll *Singlylinkedlist) FindMiddle() *SinglylinkedListNode {
 	}
 	return slow
 }
+
+func (ll *Singlylinkedlist) CheckIfPalindrome() bool {
+	if ll.Head == nil {
+		return false
+	}
+
+	if ll.Head.Next == nil {
+		return true
+	}
+
+	// lets partition the LL
+	slow := ll.Head
+	fast := ll.Head
+
+	for fast != nil && fast.Next != nil && fast.Next.Next != nil {
+		slow = slow.Next
+		fast = fast.Next.Next
+	}
+
+	// let break the LL
+	secondLL := slow.Next
+	slow.Next = nil // breaking the main LL
+	firstLL := ll.Head
+
+	/******** sample print logic ****************
+		fmt.Println("first ll")
+		for firstLL != nil {
+			fmt.Print(firstLL.Val)
+			fmt.Print(" --> ")
+			firstLL = firstLL.Next
+		}
+		fmt.Println()
+		fmt.Println()
+		fmt.Println("second ll")
+		for secondLL != nil {
+			fmt.Print(secondLL.Val)
+			fmt.Print(" --> ")
+			secondLL = secondLL.Next
+		}
+	******************************************/
+
+	// lets reverse the second LL
+	var prevNode *SinglylinkedListNode = nil
+	runnerNode := secondLL
+	for runnerNode != nil {
+		nextNode := runnerNode.Next
+		runnerNode.Next = prevNode
+		prevNode = runnerNode
+		runnerNode = nextNode
+	}
+
+	for prevNode != nil {
+		if firstLL.Val != prevNode.Val {
+			return false
+		}
+		firstLL = firstLL.Next
+		prevNode = prevNode.Next
+	}
+	return true
+}

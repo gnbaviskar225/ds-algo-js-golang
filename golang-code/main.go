@@ -7,7 +7,41 @@ import (
 )
 
 func main() {
-	testLinkedListsBasicFunctions()
+
+	// testLinkedListsBasicFunctions()
+	checkPalindrome()
+}
+func checkPalindrome() {
+	// we declare two LLs
+	ll1 := singlylinkedlist.NewDefaultSinglyLinkedList()
+	ll1.Push(1)
+	ll1.Push(2)
+	ll1.Push(3)
+	ll1.Push(3)
+	ll1.Push(2)
+	ll1.Push(1)
+
+	fmt.Printf("first ll %t ", ll1.CheckIfPalindrome())
+	fmt.Println()
+
+	ll2 := singlylinkedlist.NewDefaultSinglyLinkedList()
+	ll2.Push(1)
+	ll2.Push(2)
+	ll2.Push(3)
+	ll2.Push(3)
+	ll2.Push(2)
+	ll2.Push(1)
+	fmt.Printf("second ll %t ", ll2.CheckIfPalindrome())
+	fmt.Println()
+
+	ll3 := singlylinkedlist.NewDefaultSinglyLinkedList()
+	ll3.Push(1)
+	ll3.Push(22)
+	ll3.Push(3)
+	ll3.Push(23)
+	ll3.Push(2)
+	ll3.Push(1)
+	fmt.Printf("second ll %t ", ll3.CheckIfPalindrome())
 }
 
 func testLinkedListsBasicFunctions() {
