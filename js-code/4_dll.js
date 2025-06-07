@@ -264,6 +264,26 @@ class DoublyLinkedList {
     }
 
 
+    isPalindrome() {
+        if (!this.head) return false;
+
+        let first = 0;
+        let second = this.length - 1;
+        let frontNode = this.head;
+        let backNode = this.tail;
+        while (first < second) {
+            if (frontNode.value !== backNode.value) {
+                return false;
+            }
+            frontNode = frontNode.next;
+            backNode = backNode.prev;
+            first += 1;
+            second -= 1;
+        }
+        return true;
+    }
+
+
 }
 
 // const dll1 = new DoublyLinkedList(1);
@@ -369,22 +389,38 @@ class DoublyLinkedList {
 
 
 
-/*  
-/ testing remove method
-*/
-let dll = new DoublyLinkedList(1);
-[2,3,4,5,6,7].forEach(x => dll.push(x));
-dll.printDoublyLinkedListStringified("BEFORE REMOVE");
-dll.remove(0);
-dll.printDoublyLinkedListStringified("AFTER REMOVE HEAD");
-console.log("lets remove last/tail");
-dll.remove(5);
-dll.printDoublyLinkedListStringified("AFTER REMOVE LAST/TAI");
+// /*  
+// / testing remove method
+// */
+// let dll = new DoublyLinkedList(1);
+// [2,3,4,5,6,7].forEach(x => dll.push(x));
+// dll.printDoublyLinkedListStringified("BEFORE REMOVE");
+// dll.remove(0);
+// dll.printDoublyLinkedListStringified("AFTER REMOVE HEAD");
+// console.log("lets remove last/tail");
+// dll.remove(5);
+// dll.printDoublyLinkedListStringified("AFTER REMOVE LAST/TAI");
 
-console.log("lets remove in between");
-dll.remove(3);
-dll.printDoublyLinkedListStringified("AFTER REMOVE IN BETWEEN");
-// dll.printDoublyLinkedListStringified("AFTER INSERT LAST");
-/*  
-/ testing remove method
-*/
+// console.log("lets remove in between");
+// dll.remove(3);
+// dll.printDoublyLinkedListStringified("AFTER REMOVE IN BETWEEN");
+// // dll.printDoublyLinkedListStringified("AFTER INSERT LAST");
+// /*  
+// / testing remove method
+// */
+
+
+// /*  
+// / testing palidrome check
+// */
+// let dll = new DoublyLinkedList(1);
+// [2,3,4,3,2,1].forEach(x => dll.push(x));
+// // dll.printDoublyLinkedListStringified("BEFORE palidrome");
+// console.log(dll.isPalindrome());
+
+// let dll2 = new DoublyLinkedList(1);
+// [2,3,4,1,2,1].forEach(x => dll2.push(x));
+// console.log(dll2.isPalindrome());
+// /*  
+// / testing palidrome check
+// */
