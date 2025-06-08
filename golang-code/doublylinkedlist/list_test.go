@@ -2,6 +2,8 @@ package doublylinkedlist
 
 import (
 	"testing"
+
+	"github.com/gnbaviskar225/golang-ds/utils/helpers"
 )
 
 func TestPush(t *testing.T) {
@@ -368,4 +370,424 @@ func TestDoublyLinkedList_Unshift(t *testing.T) {
 			}
 		})
 	}
+}
+func TestDoublyLinkedList_Shift(t *testing.T) {
+	tests := []struct {
+		name           string
+		initialValues  []int
+		expectedShift  *int // nil means expect nil
+		expectedValues []int
+		expectedHead   *int
+		expectedTail   *int
+		expectedLength int
+	}{
+		{
+			name:           "Shift from empty list",
+			initialValues:  []int{},
+			expectedShift:  nil,
+			expectedValues: []int{},
+			expectedHead:   nil,
+			expectedTail:   nil,
+			expectedLength: 0,
+		},
+		{
+			name:           "Shift from single-node list",
+			initialValues:  []int{42},
+			expectedShift:  helpers.Ptr(42),
+			expectedValues: []int{},
+			expectedHead:   nil,
+			expectedTail:   nil,
+			expectedLength: 0,
+		},
+		{
+			name:           "Shift from multiple-node list",
+			initialValues:  []int{10, 20, 30},
+			expectedShift:  helpers.Ptr(10),
+			expectedValues: []int{20, 30},
+			expectedHead:   helpers.Ptr(20),
+			expectedTail:   helpers.Ptr(30),
+			expectedLength: 2,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dll := &DoublyLinkedList{}
+			for _, val := range tt.initialValues {
+				dll.Push(val)
+			}
+
+			shifted := dll.Shift()
+			if tt.expectedShift == nil {
+				if shifted != nil {
+					t.Errorf("Expected nil, got %d", shifted.Val)
+				}
+			} else {
+				if shifted == nil || shifted.Val != *tt.expectedShift {
+					t.Errorf("Expected shifted value %d, got %v", *tt.expectedShift, shifted)
+				}
+			}
+
+			// Validate list state
+			if dll.Length != tt.expectedLength {
+				t.Errorf("Expected length %d, got %d", tt.expectedLength, dll.Length)
+			}
+
+			if tt.expectedHead == nil {
+				if dll.Head != nil {
+					t.Errorf("Expected Head to be nil, got %v", dll.Head.Val)
+				}
+			} else if dll.Head == nil || dll.Head.Val != *tt.expectedHead {
+				t.Errorf("Expected Head %d, got %v", *tt.expectedHead, dll.Head)
+			}
+
+			if tt.expectedTail == nil {
+				if dll.Tail != nil {
+					t.Errorf("Expected Tail to be nil, got %v", dll.Tail.Val)
+				}
+			} else if dll.Tail == nil || dll.Tail.Val != *tt.expectedTail {
+				t.Errorf("Expected Tail %d, got %v", *tt.expectedTail, dll.Tail)
+			}
+
+			// Check the list contents forward
+			runner := dll.Head
+			for i, val := range tt.expectedValues {
+				if runner == nil || runner.Val != val {
+					t.Errorf("At index %d: expected %d, got %v", i, val, runner)
+				}
+				runner = runner.Next
+			}
+			if runner != nil {
+				t.Errorf("Expected end of list, but got extra node with val %d", runner.Val)
+			}
+		})
+	}
+}
+
+func TestDoublyLinkedList_Set(t *testing.T) {
+	tests := []struct {
+		name           string
+		initialValues  []int
+		indexToSet     int
+		newValue       int
+		expectedResult bool
+		expectedValues []int
+	}{
+		{
+			name:           "Set value at beginning",
+			initialValues:  []int{10, 20, 30},
+			indexToSet:     0,
+			newValue:       100,
+			expectedResult: true,
+			expectedValues: []int{100, 20, 30},
+		},
+		{
+			name:           "Set value in middle",
+			initialValues:  []int{10, 20, 30},
+			indexToSet:     1,
+			newValue:       200,
+			expectedResult: true,
+			expectedValues: []int{10, 200, 30},
+		},
+		{
+			name:           "Set value at end",
+			initialValues:  []int{10, 20, 30},
+			indexToSet:     2,
+			newValue:       300,
+			expectedResult: true,
+			expectedValues: []int{10, 20, 300},
+		},
+		{
+			name:           "Set value at invalid index (negative)",
+			initialValues:  []int{10, 20, 30},
+			indexToSet:     -1,
+			newValue:       999,
+			expectedResult: false,
+			expectedValues: []int{10, 20, 30},
+		},
+		{
+			name:           "Set value at invalid index (too large)",
+			initialValues:  []int{10, 20, 30},
+			indexToSet:     5,
+			newValue:       999,
+			expectedResult: false,
+			expectedValues: []int{10, 20, 30},
+		},
+		{
+			name:           "Set on empty list",
+			initialValues:  []int{},
+			indexToSet:     0,
+			newValue:       111,
+			expectedResult: false,
+			expectedValues: []int{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dll := &DoublyLinkedList{}
+			for _, val := range tt.initialValues {
+				dll.Push(val)
+			}
+
+			result := dll.Set(tt.indexToSet, tt.newValue)
+			if result != tt.expectedResult {
+				t.Errorf("Expected result %v, got %v", tt.expectedResult, result)
+			}
+
+			// verify the entire list
+			node := dll.Head
+			for i, expectedVal := range tt.expectedValues {
+				if node == nil {
+					t.Errorf("Expected node at index %d with value %d, but got nil", i, expectedVal)
+					break
+				}
+				if node.Val != expectedVal {
+					t.Errorf("At index %d, expected %d, got %d", i, expectedVal, node.Val)
+				}
+				node = node.Next
+			}
+		})
+	}
+}
+
+func TestDoublyLinkedList_Insert(t *testing.T) {
+	tests := []struct {
+		name           string
+		initialValues  []int
+		insertIndex    int
+		insertValue    int
+		expectedResult bool
+		expectedList   []int
+		expectedLength int
+	}{
+		// {
+		// 	name:           "Insert at beginning",
+		// 	initialValues:  []int{2, 3},
+		// 	insertIndex:    0,
+		// 	insertValue:    1,
+		// 	expectedResult: true,
+		// 	expectedList:   []int{1, 2, 3},
+		// 	expectedLength: 3,
+		// },
+		// {
+		// 	name:           "Insert in middle",
+		// 	initialValues:  []int{1, 3},
+		// 	insertIndex:    1,
+		// 	insertValue:    2,
+		// 	expectedResult: true,
+		// 	expectedList:   []int{1, 2, 3},
+		// 	expectedLength: 3,
+		// },
+		// {
+		// 	name:           "Insert at end",
+		// 	initialValues:  []int{1, 2},
+		// 	insertIndex:    2,
+		// 	insertValue:    3,
+		// 	expectedResult: true,
+		// 	expectedList:   []int{1, 2, 3},
+		// 	expectedLength: 3,
+		// },
+		{
+			name:           "Insert at invalid negative index",
+			initialValues:  []int{1, 2},
+			insertIndex:    -1,
+			insertValue:    0,
+			expectedResult: false,
+			expectedList:   []int{1, 2},
+			expectedLength: 2,
+		},
+		{
+			name:           "Insert at index beyond length",
+			initialValues:  []int{1, 2},
+			insertIndex:    5,
+			insertValue:    99,
+			expectedResult: false,
+			expectedList:   []int{1, 2},
+			expectedLength: 2,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dll := &DoublyLinkedList{}
+			for _, val := range tt.initialValues {
+				dll.Push(val)
+			}
+
+			result := dll.Insert(tt.insertIndex, tt.insertValue)
+			if result != tt.expectedResult {
+				t.Errorf("Insert() returned %v; expected %v", result, tt.expectedResult)
+			}
+
+			if dll.Length != tt.expectedLength {
+				t.Errorf("Expected length %d, got %d", tt.expectedLength, dll.Length)
+			}
+
+			// Validate list content
+			curr := dll.Head
+			for i, expectedVal := range tt.expectedList {
+				if curr == nil {
+					t.Errorf("Expected node with value %d at position %d, but got nil", expectedVal, i)
+					break
+				}
+				if curr.Val != expectedVal {
+					t.Errorf("Expected value %d at index %d, got %d", expectedVal, i, curr.Val)
+				}
+				curr = curr.Next
+			}
+		})
+	}
+}
+
+func TestDoublyLinkedList_DeleteNodeAtIndex(t *testing.T) {
+	tests := []struct {
+		name            string
+		initialValues   []int
+		deleteIndex     int
+		expectedDeleted *int
+		expectedList    []int
+		expectedLength  int
+		expectedHead    *int
+		expectedTail    *int
+	}{
+		{
+			name:            "Delete head from multiple nodes",
+			initialValues:   []int{1, 2, 3},
+			deleteIndex:     0,
+			expectedDeleted: intPtr(1),
+			expectedList:    []int{2, 3},
+			expectedLength:  2,
+			expectedHead:    intPtr(2),
+			expectedTail:    intPtr(3),
+		},
+		{
+			name:            "Delete tail from multiple nodes",
+			initialValues:   []int{10, 20, 30},
+			deleteIndex:     2,
+			expectedDeleted: intPtr(30),
+			expectedList:    []int{10, 20},
+			expectedLength:  2,
+			expectedHead:    intPtr(10),
+			expectedTail:    intPtr(20),
+		},
+		{
+			name:            "Delete middle node",
+			initialValues:   []int{5, 15, 25, 35},
+			deleteIndex:     2,
+			expectedDeleted: intPtr(25),
+			expectedList:    []int{5, 15, 35},
+			expectedLength:  3,
+			expectedHead:    intPtr(5),
+			expectedTail:    intPtr(35),
+		},
+		{
+			name:            "Delete only node in list",
+			initialValues:   []int{99},
+			deleteIndex:     0,
+			expectedDeleted: intPtr(99),
+			expectedList:    []int{},
+			expectedLength:  0,
+			expectedHead:    nil,
+			expectedTail:    nil,
+		},
+		{
+			name:            "Index out of bounds (negative)",
+			initialValues:   []int{1, 2, 3},
+			deleteIndex:     -1,
+			expectedDeleted: nil,
+			expectedList:    []int{1, 2, 3},
+			expectedLength:  3,
+			expectedHead:    intPtr(1),
+			expectedTail:    intPtr(3),
+		},
+		{
+			name:            "Index out of bounds (too high)",
+			initialValues:   []int{1, 2},
+			deleteIndex:     5,
+			expectedDeleted: nil,
+			expectedList:    []int{1, 2},
+			expectedLength:  2,
+			expectedHead:    intPtr(1),
+			expectedTail:    intPtr(2),
+		},
+		{
+			name:            "Delete from empty list",
+			initialValues:   []int{},
+			deleteIndex:     0,
+			expectedDeleted: nil,
+			expectedList:    []int{},
+			expectedLength:  0,
+			expectedHead:    nil,
+			expectedTail:    nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dll := &DoublyLinkedList{}
+			for _, val := range tt.initialValues {
+				dll.Push(val)
+			}
+
+			deletedNode := dll.DeleteNodeAtIndex(tt.deleteIndex)
+
+			if tt.expectedDeleted == nil {
+				if deletedNode != nil {
+					t.Errorf("Expected nil deleted node, got %v", deletedNode.Val)
+				}
+			} else {
+				if deletedNode == nil {
+					t.Errorf("Expected deleted node with value %d, got nil", *tt.expectedDeleted)
+				} else if deletedNode.Val != *tt.expectedDeleted {
+					t.Errorf("Expected deleted node value %d, got %d", *tt.expectedDeleted, deletedNode.Val)
+				}
+			}
+
+			if dll.Length != tt.expectedLength {
+				t.Errorf("Expected list length %d, got %d", tt.expectedLength, dll.Length)
+			}
+
+			if tt.expectedHead != nil {
+				if dll.Head == nil || dll.Head.Val != *tt.expectedHead {
+					t.Errorf("Expected head value %d, got %v", *tt.expectedHead, nodeVal(dll.Head))
+				}
+			} else if dll.Head != nil {
+				t.Errorf("Expected head to be nil, got %v", dll.Head.Val)
+			}
+
+			if tt.expectedTail != nil {
+				if dll.Tail == nil || dll.Tail.Val != *tt.expectedTail {
+					t.Errorf("Expected tail value %d, got %v", *tt.expectedTail, nodeVal(dll.Tail))
+				}
+			} else if dll.Tail != nil {
+				t.Errorf("Expected tail to be nil, got %v", dll.Tail.Val)
+			}
+
+			// Check full list content
+			runner := dll.Head
+			for i, expected := range tt.expectedList {
+				if runner == nil {
+					t.Errorf("Expected node at index %d with value %d, got nil", i, expected)
+					break
+				}
+				if runner.Val != expected {
+					t.Errorf("At index %d, expected %d, got %d", i, expected, runner.Val)
+				}
+				runner = runner.Next
+			}
+		})
+	}
+}
+
+// Helpers
+func intPtr(i int) *int {
+	return &i
+}
+
+func nodeVal(n *DoublyLinkedListNode) interface{} {
+	if n == nil {
+		return nil
+	}
+	return n.Val
 }
