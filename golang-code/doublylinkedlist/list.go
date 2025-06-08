@@ -243,3 +243,18 @@ func (dll *DoublyLinkedList) DeleteNodeAtIndex(index int) *DoublyLinkedListNode 
 
 	return current
 }
+
+func (dll *DoublyLinkedList) Reverse() {
+	var prevNode *DoublyLinkedListNode
+	runnerNode := dll.Head
+	tempHead := dll.Head
+	for runnerNode != nil {
+		tempNode := runnerNode.Next
+		runnerNode.Next = runnerNode.Prev
+		runnerNode.Prev = tempNode
+		prevNode = runnerNode
+		runnerNode = runnerNode.Prev
+	}
+	dll.Tail = tempHead
+	dll.Head = prevNode
+}

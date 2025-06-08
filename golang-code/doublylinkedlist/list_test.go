@@ -780,6 +780,80 @@ func TestDoublyLinkedList_DeleteNodeAtIndex(t *testing.T) {
 	}
 }
 
+func TestDoublyLinkedList_Reverse(t *testing.T) {
+	tests := []struct {
+		name           string
+		initialValues  []int
+		expectedValues []int
+		expectedHead   *int
+		expectedTail   *int
+	}{
+		{
+			name:           "Reverse multiple nodes",
+			initialValues:  []int{1, 2, 3, 4},
+			expectedValues: []int{4, 3, 2, 1},
+			expectedHead:   intPtr(4),
+			expectedTail:   intPtr(1),
+		},
+		{
+			name:           "Reverse single node",
+			initialValues:  []int{99},
+			expectedValues: []int{99},
+			expectedHead:   intPtr(99),
+			expectedTail:   intPtr(99),
+		},
+		{
+			name:           "Reverse empty list",
+			initialValues:  []int{},
+			expectedValues: []int{},
+			expectedHead:   nil,
+			expectedTail:   nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dll := &DoublyLinkedList{}
+			for _, val := range tt.initialValues {
+				dll.Push(val)
+			}
+
+			dll.Reverse() // assume you are writing it as a method on the list
+
+			// Check head
+			if tt.expectedHead == nil {
+				if dll.Head != nil {
+					t.Errorf("Expected head to be nil, got %v", dll.Head.Val)
+				}
+			} else if dll.Head == nil || dll.Head.Val != *tt.expectedHead {
+				t.Errorf("Expected head value %d, got %v", *tt.expectedHead, nodeVal(dll.Head))
+			}
+
+			// Check tail
+			if tt.expectedTail == nil {
+				if dll.Tail != nil {
+					t.Errorf("Expected tail to be nil, got %v", dll.Tail.Val)
+				}
+			} else if dll.Tail == nil || dll.Tail.Val != *tt.expectedTail {
+				t.Errorf("Expected tail value %d, got %v", *tt.expectedTail, nodeVal(dll.Tail))
+			}
+
+			// Check full list content
+			runner := dll.Head
+			for i, expected := range tt.expectedValues {
+				if runner == nil {
+					t.Errorf("Expected node at index %d with value %d, got nil", i, expected)
+					break
+				}
+				if runner.Val != expected {
+					t.Errorf("At index %d, expected %d, got %d", i, expected, runner.Val)
+				}
+				runner = runner.Next
+			}
+		})
+	}
+}
+
 // Helpers
 func intPtr(i int) *int {
 	return &i
