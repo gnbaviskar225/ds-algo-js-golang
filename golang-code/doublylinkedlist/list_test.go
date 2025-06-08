@@ -290,3 +290,82 @@ func TestDoublyLinkedList_GetNodeByIndex(t *testing.T) {
 		})
 	}
 }
+
+func TestDoublyLinkedList_Unshift(t *testing.T) {
+	tests := []struct {
+		name           string
+		initialValues  []int
+		unshiftValue   int
+		expectedList   []int
+		expectedHead   int
+		expectedTail   int
+		expectedLength int
+	}{
+		{
+			name:           "Unshifting into empty list",
+			initialValues:  []int{},
+			unshiftValue:   5,
+			expectedList:   []int{5},
+			expectedHead:   5,
+			expectedTail:   5,
+			expectedLength: 1,
+		},
+		{
+			name:           "Unshifting into non-empty list",
+			initialValues:  []int{10, 20},
+			unshiftValue:   5,
+			expectedList:   []int{5, 10, 20},
+			expectedHead:   5,
+			expectedTail:   20,
+			expectedLength: 3,
+		},
+		{
+			name:           "Unshifting another element",
+			initialValues:  []int{15},
+			unshiftValue:   7,
+			expectedList:   []int{7, 15},
+			expectedHead:   7,
+			expectedTail:   15,
+			expectedLength: 2,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dll := &DoublyLinkedList{}
+			for _, val := range tt.initialValues {
+				dll.Push(val)
+			}
+
+			dll.Unshift(tt.unshiftValue)
+
+			// check list values forward
+			runner := dll.Head
+			for i, expectedVal := range tt.expectedList {
+				if runner == nil {
+					t.Errorf("Node at index %d is nil, expected %d", i, expectedVal)
+					break
+				}
+				if runner.Val != expectedVal {
+					t.Errorf("Expected value %d at index %d, got %d", expectedVal, i, runner.Val)
+				}
+				runner = runner.Next
+			}
+
+			// check head
+			if dll.Head == nil || dll.Head.Val != tt.expectedHead {
+				t.Errorf("Expected head value %d, got %v", tt.expectedHead, dll.Head)
+			}
+
+			// check tail
+			if dll.Tail == nil || dll.Tail.Val != tt.expectedTail {
+				t.Errorf("Expected tail value %d, got %v", tt.expectedTail, dll.Tail)
+			}
+
+			// check length
+			if dll.Length != tt.expectedLength {
+				t.Errorf("Expected length %d, got %d", tt.expectedLength, dll.Length)
+			}
+		})
+	}
+}

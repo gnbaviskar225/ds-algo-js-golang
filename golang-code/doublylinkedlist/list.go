@@ -84,3 +84,19 @@ func (dll *DoublyLinkedList) GetNodeByIndex(index int) *DoublyLinkedListNode {
 	}
 	return runnerNode
 }
+
+func (dll *DoublyLinkedList) Unshift(val int) {
+	newHead := NewDefaultDoublyLinkedListNode(val)
+	if dll.Head == nil {
+		dll.Head = newHead
+		dll.Tail = newHead
+		dll.Length += 1
+		return
+	}
+
+	oldHead := dll.Head
+	oldHead.Prev = newHead
+	newHead.Next = oldHead
+	dll.Head = newHead
+	dll.Length += 1
+}
